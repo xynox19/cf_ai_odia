@@ -1,24 +1,35 @@
+import { UserMemory } from "./memory";
+
 export default {
   async fetch(req, env) {
-    const result = await env.AI.run(
+    const { message, userId } = await req.json();
+
+    const id = env.USER_MEMORY.idFromName(userId);
+    const memoryStub = env.USER_MEMORY.get(id);
+
+    const memoryRes = await memoryStub.fetch("https://memory/");
+    const memory = await memoryRes.json();
+
+    const ai = await env.AI.run(
       "@cf/meta/llama-3.3-70b-instruct",
       {
         messages: [
           {
             role: "system",
-            content: `
-You are an Odia language tutor.
-Always include:
-- Odia script
-- English meaning
-- One example sentence
-`
+            content: `User level: ${memory.level}`
           },
-          { role: "user", content: "Teach me a greeting" }
+          { role: "user", content: message }
         ]
       }
     );
 
-    return Response.json({ reply: result.response });
+    await memoryStub.fetch("https://memory/save", {
+      method: "POST",
+      body: JSON.stringify(memory)
+    });
+
+    return Response.json({ reply: ai.response });
   }
 };
+
+export { UserMemory };
