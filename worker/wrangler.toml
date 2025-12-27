@@ -1,0 +1,14 @@
+name = "odia-ai-tutor"
+main = "index.js"
+compatibility_date = "2024-10-01"
+
+[ai]
+binding = "AI"
+
+[[durable_objects.bindings]]
+name = "USER_MEMORY"
+class_name = "UserMemory"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["UserMemory"]
