@@ -33,3 +33,8 @@ export default {
 };
 
 export { UserMemory };
+
+if (new URL(req.url).pathname === "/api/chat") {
+  // existing logic
+}
+
